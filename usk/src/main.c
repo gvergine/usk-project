@@ -35,9 +35,7 @@ void unload_all_plugins()
     while(!LIST_EMPTY(&plugins_list))
     {
     	first = LIST_FIRST(&plugins_list);
-        printf("Unloading plugin %s\n",first->vtable->name);
-        dlclose(first->handle);
-    	LIST_REMOVE(first, pointers);
+    	unload(first);
     }
 }
 

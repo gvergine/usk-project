@@ -42,7 +42,7 @@ void printk();
 
 //syscalls
 usk_plugin_ptr load(const char* path);
-int unload(const char* name);
+int unload(usk_plugin_ptr plugin);
 
 
 #endif /* USK_PLUGIN_H_ */

@@ -26,6 +26,8 @@
 static const char prompt[3]   = "> \0";
 static const char* cmd_exit = "exit";
 
+extern struct usk_plugin_list plugins_list;
+
 struct command
 {
     const char * name;
@@ -64,10 +66,59 @@ void command_load(int argc, const char * argv[])
 
 }
 
+usk_plugin_ptr find_plugin_with_name(const char* name)
+{
+    usk_plugin_ptr plugin;
+    LIST_FOREACH(plugin,&plugins_list,pointers)
+    {
+        if (strcmp(plugin->vtable->name,name)==0)
+        {
+            return plugin;
+        }
+    }
+
+    return 0;
+}
+
+void command_unload(int argc, const char * argv[])
+{
+    if (argc > 1)
+    {
+        puts("unload: syntax: unload <plugin_name>\n");
+        return;
+    }
+
+    usk_plugin_ptr plugin = find_plugin_with_name(argv[0]);
+
+    if (plugin == 0)
+    {
+        printf("could not find plugin %s\n",argv[0]);
+        return;
+    }
+
+    unload(plugin);
+
+}
+
+void command_plugins(int argc, const char * argv[])
+{
+    if (argc > 0)
+    {
+        puts("plugins: syntax: plugins <no arguments>\n");
+        return;
+    }
+
+    usk_plugin_ptr plugin;
+    LIST_FOREACH(plugin,&plugins_list,pointers)
+    {
+        printf("%s\n",plugin->vtable->name);
+    }
+}
+
 static struct command commands[] = {
         {"load", command_load},
-        //		"unload",
-        //		"plugins",
+		{"unload", command_unload},
+		{"plugins", command_plugins},
         //		"create",
         //		"destroy",
         //		"loops",

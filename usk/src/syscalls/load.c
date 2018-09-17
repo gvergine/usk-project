@@ -76,21 +76,11 @@ usk_plugin_ptr load(const char* path)
     return 0;
 }
 
-int unload(const char* name)
+int unload(usk_plugin_ptr plugin)
 {
-    usk_plugin_ptr plugin;
-    LIST_FOREACH(plugin,&plugins_list,pointers)
-    {
-        if (strcmp(plugin->vtable->name,name)==0)
-        {
-            printf("Unloading plugin %s\n",plugin->vtable->name);
-            dlclose(plugin->handle);
-        	LIST_REMOVE(plugin, pointers);
-            return 0;
-        }
-    }
-
-    printf("Plugin %s not found\n",name);
-    return -1;
+    printf("Unloading plugin %s\n",plugin->vtable->name);
+    dlclose(plugin->handle);
+    LIST_REMOVE(plugin, pointers);
+    return 0;
 }
 
