@@ -1,0 +1,6 @@
+file(GLOB_RECURSE SOURCES "src/*.c")
+include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+add_executable(usk ${SOURCES})
+set_target_properties(usk PROPERTIES LINK_FLAGS "-rdynamic")
+target_link_libraries(usk dl)
