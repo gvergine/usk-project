@@ -1,8 +1,19 @@
 /*
- * usk-plugin.h
- *
- *  Created on: Sep 15, 2018
- *      Author: developer
+    usk-project
+    Copyright (C) 2018  Giovanni Davide Vergine
+
+    This project is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef USK_PLUGIN_H_
@@ -12,16 +23,16 @@
 
 typedef struct usk_plugin
 {
-	void * handle;
-	struct export_vtable * vtable;
+    void * handle;
+    struct export_vtable * vtable;
 } usk_plugin_t;
 
 typedef usk_plugin_t * usk_plugin_ptr;
 
 typedef struct export_vtable
 {
-   const char * name;
-   void (*loop)(void);
+    const char * name;
+    void (*loop)(void);
 } export_vtable_t;
 
 void printk();
