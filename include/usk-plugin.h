@@ -25,9 +25,12 @@ typedef struct usk_plugin
 {
     void * handle;
     struct export_vtable * vtable;
+    LIST_ENTRY(usk_plugin) pointers;
 } usk_plugin_t;
 
 typedef usk_plugin_t * usk_plugin_ptr;
+
+LIST_HEAD(usk_plugin_list, usk_plugin);
 
 typedef struct export_vtable
 {
@@ -38,8 +41,8 @@ typedef struct export_vtable
 void printk();
 
 //syscalls
-int load(const char* path, usk_plugin_ptr *plugin);
-int unload(const char* plugin_name);
+usk_plugin_ptr load(const char* path);
+int unload(const char* name);
 
 
 #endif /* USK_PLUGIN_H_ */

@@ -50,10 +50,9 @@ void command_load(int argc, const char * argv[])
         return;
     }
 
-    usk_plugin_ptr plugin;
-    int ret = load(argv[0], &plugin);
+    usk_plugin_ptr plugin = load(argv[0]);
 
-    if (ret != 0)
+    if (plugin == 0)
     {
         printf("could not load %s\n",argv[0]);
         return;

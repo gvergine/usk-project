@@ -19,16 +19,17 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <stdio.h>
+#include <string.h>
 #include "usk-plugin.h"
-#include "main.h"
 
-extern plugins_t * plugins;
+extern struct usk_plugin_list plugins_list;
 
-int load(const char* path, usk_plugin_ptr *plugin)
+usk_plugin_ptr load(const char* path)
 {
     void *handle;
     char *error;
     export_vtable_t* imports;
+    usk_plugin_ptr plugin;
 
     handle = dlopen (path, RTLD_NOW);
 
@@ -36,7 +37,7 @@ int load(const char* path, usk_plugin_ptr *plugin)
     {
         fputs (dlerror(), stderr);
         fputs ("\n", stderr);
-        return -2;
+        return 0;
     }
 
     imports = dlsym(handle, "exports");
@@ -46,35 +47,50 @@ int load(const char* path, usk_plugin_ptr *plugin)
         dlclose(handle);
         fputs(error, stderr);
         fputs ("\n", stderr);
-        return -3;
+        return 0;
     }
 
     if (imports)
     {
-        *plugin = (usk_plugin_ptr)malloc(sizeof(usk_plugin_t));
-        (*plugin)->handle = handle;
-        (*plugin)->vtable = imports;
-        add_plugin(plugins, *plugin);
-        printf("Loaded plugin %s\n",(*plugin)->vtable->name);
-        return 0;
+        plugin = (usk_plugin_ptr)malloc(sizeof(usk_plugin_t));
+        plugin->handle = handle;
+        plugin->vtable = imports;
+
+        usk_plugin_ptr i;
+        LIST_FOREACH(i,&plugins_list,pointers)
+        {
+            if (strcmp(i->vtable->name,plugin->vtable->name)==0)
+            {
+            	printf("A plugin with name %s already exist.\n",i->vtable->name);
+                dlclose(handle);
+                return i;
+            }
+        }
+
+        LIST_INSERT_HEAD(&plugins_list, plugin, pointers);
+        printf("Loaded plugin %s\n",plugin->vtable->name);
+        return plugin;
     }
 
     dlclose(handle);
-    return -1;
+    return 0;
 }
 
-int unload(const char* plugin_name)
+int unload(const char* name)
 {
-    usk_plugin_ptr plugin = find_plugin(plugins, plugin_name);
-    if (plugin == 0)
+    usk_plugin_ptr plugin;
+    LIST_FOREACH(plugin,&plugins_list,pointers)
     {
-        printf("Plugin %s not found\n",plugin_name);
-        return -1;
+        if (strcmp(plugin->vtable->name,name)==0)
+        {
+            printf("Unloading plugin %s\n",plugin->vtable->name);
+            dlclose(plugin->handle);
+        	LIST_REMOVE(plugin, pointers);
+            return 0;
+        }
     }
-    printf("Unloading plugin %s\n",plugin->vtable->name);
-    dlclose(plugin->handle);
-    remove_plugin(plugins, plugin);
-    free(plugin);
-    return 0;
+
+    printf("Plugin %s not found\n",name);
+    return -1;
 }
 
