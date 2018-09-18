@@ -32,6 +32,7 @@ struct command
 {
     const char * name;
     void (*function)(int, const char **);
+    const char * description;
 };
 
 void print_gpl_notice()
@@ -40,15 +41,15 @@ void print_gpl_notice()
             "usk Copyright (C) 2018  Giovanni Davide Vergine\n"
             "This program comes with ABSOLUTELY NO WARRANTY.\n"
             "This is free software, and you are welcome to redistribute it\n"
-            "under the terms of GPLv3 license.\n"
+            "under the terms of GPLv3 license."
     );
 }
 
 void command_load(int argc, const char * argv[])
 {
-    if (argc > 1)
+    if (argc != 1)
     {
-        puts("load: syntax: load <path to usk plugin>\n");
+        puts("load: syntax: load <path to usk plugin>");
         return;
     }
 
@@ -82,9 +83,9 @@ usk_plugin_ptr find_plugin_with_name(const char* name)
 
 void command_unload(int argc, const char * argv[])
 {
-    if (argc > 1)
+    if (argc != 1)
     {
-        puts("unload: syntax: unload <plugin_name>\n");
+        puts("unload: syntax: unload <plugin_name>");
         return;
     }
 
@@ -104,7 +105,7 @@ void command_plugins(int argc, const char * argv[])
 {
     if (argc > 0)
     {
-        puts("plugins: syntax: plugins <no arguments>\n");
+        puts("plugins: syntax: plugins <no arguments>");
         return;
     }
 
@@ -115,16 +116,32 @@ void command_plugins(int argc, const char * argv[])
     }
 }
 
+void command_help(int argc, const char * argv[]);
+
 static struct command commands[] = {
-        {"load", command_load},
-        {"unload", command_unload},
-        {"plugins", command_plugins},
+        {"help", command_help, "print this help"},
+        {"load", command_load, "load a plugin from filesystem"},
+        {"unload", command_unload, "unload a plugin"},
+        {"plugins", command_plugins, "list loaded plugins"},
         //		"create",
         //		"destroy",
         //		"loops",
-        {0,0}
+        {0,0,0}
 };
 
+
+void command_help(int argc, const char * argv[])
+{
+    int i = 0;
+    struct command c = commands[i];
+    while (c.name != 0)
+    {
+        printf("%s - %s\n",c.name,c.description);
+        i++;
+        c = commands[i];
+    }
+
+}
 
 
 void process(char * input)
