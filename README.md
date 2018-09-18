@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/gvergine/usk-project.svg?branch=master)](https://travis-ci.org/gvergine/usk-project)
+
 # usk-project
 user-space kernel
 trying to extend ip addressing to threads and functions
