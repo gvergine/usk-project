@@ -38,10 +38,10 @@ struct command
 void print_gpl_notice()
 {
     puts(
-            "usk Copyright (C) 2018  Giovanni Davide Vergine\n"
+            "usk-shell Copyright (C) 2018  Giovanni Davide Vergine\n"
             "This program comes with ABSOLUTELY NO WARRANTY.\n"
-            "This is free software, and you are welcome to redistribute it\n"
-            "under the terms of GPLv3 license."
+            "This is free software, you are welcome to redistribute\n"
+    		"it under the terms of GPLv3 license."
     );
 }
 
