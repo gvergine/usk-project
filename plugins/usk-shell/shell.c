@@ -117,8 +117,8 @@ void command_plugins(int argc, const char * argv[])
 
 static struct command commands[] = {
         {"load", command_load},
-		{"unload", command_unload},
-		{"plugins", command_plugins},
+        {"unload", command_unload},
+        {"plugins", command_plugins},
         //		"create",
         //		"destroy",
         //		"loops",

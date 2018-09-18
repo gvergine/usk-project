@@ -34,8 +34,8 @@ void unload_all_plugins()
     usk_plugin_ptr first;
     while(!LIST_EMPTY(&plugins_list))
     {
-    	first = LIST_FIRST(&plugins_list);
-    	unload(first);
+        first = LIST_FIRST(&plugins_list);
+        unload(first);
     }
 }
 
