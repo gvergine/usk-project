@@ -16,36 +16,35 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef USK_PLUGIN_H_
-#define USK_PLUGIN_H_
+#include <stdarg.h>
+#include "usk-log.h"
+#include <time.h>
+#include <stdio.h>
 
-#include <sys/queue.h>
-#include <stdint.h>
+static volatile uint8_t log_level;
 
-typedef struct export_vtable
+void set_usk_log_level(uint8_t level)
 {
-    const char * name;
-    void (*loop)(void);
-} export_vtable_t;
+    log_level = level;
+}
 
-// plugin
-typedef struct usk_plugin
+void usk_log(uint8_t level, const char* format, ...)
 {
-    void * handle;
-    struct export_vtable * vtable;
-    LIST_ENTRY(usk_plugin) pointers;
-} usk_plugin_t;
+    struct timespec t;
+    va_list args;
+    va_start(args,format);
 
-typedef usk_plugin_t * usk_plugin_ptr;
+    if (level & log_level)
+    {
+        (void)clock_gettime(CLOCK_MONOTONIC,&t);
+        printf("[%lld.%.6ld] ",(long long)t.tv_sec,t.tv_nsec);
+        vprintf(format,args);
+        printf("\n");
+    }
 
-LIST_HEAD(usk_plugin_list, usk_plugin);
-//
+    va_end(args);
+}
 
 
 
-void printk();
 
-usk_plugin_ptr load(const char* path);
-int unload(usk_plugin_ptr plugin);
-
-#endif /* USK_PLUGIN_H_ */

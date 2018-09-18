@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "usk-plugin.h"
+#include "usk-log.h"
 
 extern struct usk_plugin_list plugins_list;
 
@@ -35,8 +36,7 @@ usk_plugin_ptr load(const char* path)
 
     if (!handle)
     {
-        fputs (dlerror(), stderr);
-        fputs ("\n", stderr);
+        usk_log(LOG_ERROR, dlerror());
         return 0;
     }
 
@@ -45,8 +45,7 @@ usk_plugin_ptr load(const char* path)
     if ((error = dlerror()) != NULL)
     {
         dlclose(handle);
-        fputs(error, stderr);
-        fputs ("\n", stderr);
+        usk_log(LOG_ERROR, error);
         return 0;
     }
 
@@ -61,14 +60,14 @@ usk_plugin_ptr load(const char* path)
         {
             if (strcmp(i->vtable->name,plugin->vtable->name)==0)
             {
-                printf("A plugin with name %s already exist.\n",i->vtable->name);
+                usk_log(LOG_WARN,"A plugin with name %s already exists",i->vtable->name);
                 dlclose(handle);
                 return i;
             }
         }
 
         LIST_INSERT_HEAD(&plugins_list, plugin, pointers);
-        printf("Loaded plugin %s\n",plugin->vtable->name);
+        usk_log(LOG_DEBUG,"Loaded plugin %s",plugin->vtable->name);
         return plugin;
     }
 
@@ -78,7 +77,7 @@ usk_plugin_ptr load(const char* path)
 
 int unload(usk_plugin_ptr plugin)
 {
-    printf("Unloading plugin %s\n",plugin->vtable->name);
+    usk_log(LOG_DEBUG,"Unloading plugin %s",plugin->vtable->name);
     dlclose(plugin->handle);
     LIST_REMOVE(plugin, pointers);
     return 0;

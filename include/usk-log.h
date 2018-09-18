@@ -16,36 +16,20 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef USK_PLUGIN_H_
-#define USK_PLUGIN_H_
+#ifndef INCLUDE_USK_LOG_H_
+#define INCLUDE_USK_LOG_H_
 
-#include <sys/queue.h>
 #include <stdint.h>
 
-typedef struct export_vtable
-{
-    const char * name;
-    void (*loop)(void);
-} export_vtable_t;
+#define LOG_DEBUG 0x01
+#define LOG_INFO  0x02
+#define LOG_WARN  0x04
+#define LOG_ERROR 0x08
 
-// plugin
-typedef struct usk_plugin
-{
-    void * handle;
-    struct export_vtable * vtable;
-    LIST_ENTRY(usk_plugin) pointers;
-} usk_plugin_t;
-
-typedef usk_plugin_t * usk_plugin_ptr;
-
-LIST_HEAD(usk_plugin_list, usk_plugin);
-//
+//syscalls
+void set_usk_log_level(uint8_t level);
+void usk_log(uint8_t level, const char* format, ...);
 
 
 
-void printk();
-
-usk_plugin_ptr load(const char* path);
-int unload(usk_plugin_ptr plugin);
-
-#endif /* USK_PLUGIN_H_ */
+#endif /* INCLUDE_USK_LOG_H_ */

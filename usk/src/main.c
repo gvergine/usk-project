@@ -21,6 +21,7 @@
 #include <dlfcn.h>
 #include <sys/queue.h>
 #include "usk-plugin.h"
+#include "usk-log.h"
 
 void printk()
 {
@@ -42,7 +43,8 @@ void unload_all_plugins()
 int main(int argc, char* argv[])
 {
     (void) argc;
-
+    set_usk_log_level(-1);
+    usk_log(LOG_INFO, "usk init start");
     LIST_INIT(&plugins_list);
 
     usk_plugin_ptr plugin = load(argv[1]);
@@ -51,10 +53,12 @@ int main(int argc, char* argv[])
     {
         return -1;
     }
+    usk_log(LOG_INFO, "usk init done");
 
     plugin->vtable->loop();
 
+    usk_log(LOG_INFO, "usk stopping");
     unload_all_plugins();
-
+    usk_log(LOG_INFO, "usk gone");
     return 0;
 }
