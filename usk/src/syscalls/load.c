@@ -25,6 +25,7 @@
 
 extern struct usk_plugin_list plugins_list;
 
+__attribute__ ((visibility("default")))
 usk_plugin_ptr load(const char* path)
 {
     void *handle;
@@ -75,6 +76,7 @@ usk_plugin_ptr load(const char* path)
     return 0;
 }
 
+__attribute__ ((visibility("default")))
 int unload(usk_plugin_ptr plugin)
 {
     usk_log(LOG_DEBUG,"Unloading plugin %s",plugin->vtable->name);

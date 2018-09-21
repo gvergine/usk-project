@@ -16,15 +16,24 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "usk-plugin.h"
-#include <fcntl.h>
-#include <stdio.h>
+#ifndef USK_THREAD_H_
+#define USK_THREAD_H_
 
-void loop()
+#include <sys/queue.h>
+#include <pthread.h>
+
+typedef struct usk_thread
 {
-    int fd = open("myfile",0);
-    printf("%d\n",fd);
-}
+    pthread_t thread;
+    char * name;
+    LIST_ENTRY(usk_thread) pointers;
+} usk_thread_t;
 
-__attribute__ ((visibility("default")))
-export_vtable_t exports = { "bubblesort", loop };
+typedef usk_thread_t * usk_thread_ptr;
+
+LIST_HEAD(usk_thread_list, usk_thread);
+
+usk_thread_ptr start(const char* name);
+int stop(usk_thread_ptr thread);
+
+#endif /* USK_THREAD_H_ */

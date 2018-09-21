@@ -15,20 +15,24 @@
     You should have received a copy of the GNU General Public License
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <dlfcn.h>
 #include <sys/queue.h>
 #include "usk-plugin.h"
 #include "usk-log.h"
+#include "usk-thread.h"
 
 void printk()
 {
     printf("Hello from the user space kernel!\n");
 }
 
+__attribute__ ((visibility("default")))
 struct usk_plugin_list plugins_list;
+
+__attribute__ ((visibility("default")))
+struct usk_thread_list threads_list;
 
 void unload_all_plugins()
 {
@@ -40,11 +44,14 @@ void unload_all_plugins()
     }
 }
 
+
+extern void init_wrappers();
+
 int main(int argc, char* argv[])
 {
-    (void) argc;
     set_usk_log_level(-1);
     usk_log(LOG_INFO, "usk init start");
+	init_wrappers();
     LIST_INIT(&plugins_list);
 
     usk_plugin_ptr plugin = load(argv[1]);

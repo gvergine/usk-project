@@ -16,15 +16,24 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "usk-plugin.h"
-#include <fcntl.h>
+#define _GNU_SOURCE
+
+#include "usk-log.h"
+#include <dlfcn.h>
 #include <stdio.h>
 
-void loop()
+typedef int (*orig_open_f_type)(const char *pathname, int flags);
+static orig_open_f_type orig_open;
+
+void init_wrappers()
 {
-    int fd = open("myfile",0);
-    printf("%d\n",fd);
+    orig_open = (orig_open_f_type)dlsym(RTLD_NEXT,"open");
 }
 
 __attribute__ ((visibility("default")))
-export_vtable_t exports = { "bubblesort", loop };
+int open(const char *pathname, int flags)
+{
+    usk_log(LOG_INFO, "proxying open");
+    return orig_open(pathname,flags);
+}
+

@@ -22,11 +22,13 @@
 
 #include "shell.h"
 #include "usk-plugin.h"
+#include "usk-thread.h"
 
 static const char prompt[3]   = "> \0";
 static const char* cmd_exit = "exit";
 
 extern struct usk_plugin_list plugins_list;
+extern struct usk_thread_list threads_list;
 
 struct command
 {
@@ -77,7 +79,6 @@ usk_plugin_ptr find_plugin_with_name(const char* name)
             return plugin;
         }
     }
-
     return 0;
 }
 
@@ -116,6 +117,74 @@ void command_plugins(int argc, const char * argv[])
     }
 }
 
+void command_start(int argc, const char * argv[])
+{
+    if (argc != 1)
+    {
+        puts("start: syntax: start <thread name>");
+        return;
+    }
+
+    usk_thread_ptr thread = start(argv[0]);
+
+    if (thread == 0)
+    {
+        printf("could not start thread %s\n",argv[0]);
+        return;
+    }
+
+}
+
+usk_thread_ptr find_thread_with_name(const char* name)
+{
+	usk_thread_ptr t;
+    LIST_FOREACH(t,&threads_list,pointers)
+    {
+        if (strcmp(t->name,name)==0)
+        {
+            return t;
+        }
+    }
+    return 0;
+}
+
+
+void command_stop(int argc, const char * argv[])
+{
+    if (argc != 1)
+    {
+        puts("stop: syntax: stop <thread name>");
+        return;
+    }
+
+    usk_thread_ptr t = find_thread_with_name(argv[0]);
+
+    if (t == 0)
+    {
+        printf("could not find thread %s\n",argv[0]);
+        return;
+    }
+
+    stop(t);
+
+}
+
+void command_threads(int argc, const char * argv[])
+{
+    if (argc > 0)
+    {
+        puts("threads: syntax: threads <no arguments>");
+        return;
+    }
+
+    usk_thread_ptr t;
+    LIST_FOREACH(t,&threads_list,pointers)
+    {
+        printf("%s\n",t->name);
+    }
+
+}
+
 void command_help(int argc, const char * argv[]);
 
 static struct command commands[] = {
@@ -123,9 +192,9 @@ static struct command commands[] = {
         {"load", command_load, "load a plugin from filesystem"},
         {"unload", command_unload, "unload a plugin"},
         {"plugins", command_plugins, "list loaded plugins"},
-        //		"create",
-        //		"destroy",
-        //		"loops",
+		{"start", command_start, "start a worker thread"},
+		{"stop", command_stop, "stop a worker thread"},
+		{"threads", command_threads, "list worker threads"},
         {0,0,0}
 };
 
@@ -158,9 +227,7 @@ void process(char * input)
             return;
         }
     }
-
     printf("%s: no such command\n", vec[0]);
-
 }
 
 
@@ -194,5 +261,6 @@ void loop()
 
 }
 
+__attribute__ ((visibility("default")))
 export_vtable_t exports = { "usk_shell", loop };
 
